@@ -48,12 +48,9 @@ def update_note(note_id: str, update_data: NoteCreate):
 
 #Eliminar nota
 @app.delete("/notes/{note_id}")
-def delete_note(note_id: int):
-    for i, n in enumerate(notes_db):
-        if n.id == note_id:
-            del notes_db[i]
-            return {"message": "Nota eliminada"}
-        
-    raise HTTPException(status_code=404, detail="Nota no encontrada")
-        
-    
+def delete_note(note_id: str):
+    global notes_db
+    if not any(note.id == note_id for note in notes_db):
+        raise HTTPException(status_code=404, detail="Nota no encontrada")
+    notes_db = [note for note in notes_db if note.id != note_id]
+    return {"message": "Nota eliminada"}
