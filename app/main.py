@@ -37,10 +37,11 @@ def create_note(note_data: NoteCreate):
 
 #Actualizar nota
 @app.put("/notes/{note_id}")
-def update_note(note_id: int, note: Note):
-    for i, n in enumerate(notes_db):
-        if n.id == note_id:
-            notes_db[i] = note
+def update_note(note_id: str, update_data: NoteCreate):
+    for note in notes_db:
+        if note.id == note_id:
+            note.title = update_data.title
+            note.content = update_data.content
             return {"message": "Nota actualizada", "note": note}
     
     raise HTTPException(status_code=404, detail="Nota no encontrada")
