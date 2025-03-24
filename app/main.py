@@ -4,7 +4,11 @@ from typing import List
 from fastapi import HTTPException
 import uuid
 
-app = FastAPI()
+app = FastAPI(
+    title = "API de Notas",
+    description = "Una API para gestionar notas usando FastAPI",
+    version="1.0.0"
+)
 
 class NoteCreate(BaseModel):
     title: str
@@ -20,12 +24,15 @@ notes_db: List[Note] = []
 #Endpoint para obtener todas las notas
 
 #Obtener notas
-@app.get("/notes")
-def get_notes():
+@app.get("/notes", summary = "Obtener todas las notas")
+def get_notes(title: str = None):
+    if title:
+        filtered_notes = [note for note in notes_db if title.lower() in note.title.lower()]
+        return filtered_notes
     return notes_db
 
 #Crear notas
-@app.post("/notes")
+@app.post("/notes", summary = "Crear nota")
 def create_note(note_data: NoteCreate):
     for n in notes_db:
         if n.title == note_data.title:
@@ -36,7 +43,7 @@ def create_note(note_data: NoteCreate):
     return {"message": "Nota creada", "note": new_note}
 
 #Actualizar nota
-@app.put("/notes/{note_id}")
+@app.put("/notes/{note_id}", summary = "Actualizar notas")
 def update_note(note_id: str, update_data: NoteCreate):
     for note in notes_db:
         if note.id == note_id:
@@ -47,7 +54,7 @@ def update_note(note_id: str, update_data: NoteCreate):
     raise HTTPException(status_code=404, detail="Nota no encontrada")
 
 #Eliminar nota
-@app.delete("/notes/{note_id}")
+@app.delete("/notes/{note_id}", summary = "Eliminar nota")
 def delete_note(note_id: str):
     global notes_db
     if not any(note.id == note_id for note in notes_db):
